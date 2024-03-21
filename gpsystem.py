@@ -5,7 +5,7 @@ from operator import attrgetter
 import random
 
 from readers.argreader import ArgReader
-from game import Game
+from game import Game, prog2, prog3
 
 class GPSystem:
     def __init__(self, arg_file):
@@ -14,15 +14,15 @@ class GPSystem:
         self.ephemeral_random = random.Random(0)
         self.pset = gp.PrimitiveSet("MAIN", 0)
         self.toolbox = base.Toolbox()
-        self.game = Game([100, 100])
+        self.game = Game([self.args["map_width"], self.args["map_height"]])
         
         # Number represents arity of operator.
-        self.pset.addPrimitive(self.game.predator_progn2, 2)
-        self.pset.addPrimitive(self.game.predator_if_adjacent_creature, 2)
-        self.pset.addPrimitive(self.game.predator_progn3, 3)
-        self.pset.addTerminal(self.game.predator_move)
-        self.pset.addTerminal(self.game.predator_turn_left)
-        self.pset.addTerminal(self.game.predator_turn_right)
+        self.pset.addPrimitive(prog2, 2)
+        # self.pset.addPrimitive(self.game.if_then_else, 2)
+        self.pset.addPrimitive(prog3, 3)
+        self.pset.addTerminal(self.game.move)
+        self.pset.addTerminal(self.game.turn_left)
+        self.pset.addTerminal(self.game.turn_right)
 
         # Positive weight represents a maximization problem.
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -32,8 +32,8 @@ class GPSystem:
             "expr",
             gp.genHalfAndHalf,
             pset=self.pset,
-            min_=self.args["individual_min_depth"],
-            max_=self.args["individual_max_depth"],
+            min_=self.args["init_min_depth"],
+            max_=self.args["init_max_depth"],
         )
         self.toolbox.register("individual", tools.initIterate, creator.Individual, self.toolbox.expr)
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
@@ -43,8 +43,8 @@ class GPSystem:
         self.toolbox.register("mate", gp.cxOnePoint)
         self.toolbox.register("expr_mut", gp.genFull, min_=self.args["mutation_min_depth"], max_=self.args["mutation_max_depth"])
         self.toolbox.register("mutate", gp.mutUniform, expr=self.toolbox.expr_mut, pset=self.pset)
-        self.toolbox.decorate("mate", gp.staticLimit(key=attrgetter("height"), max_value=17))
-        self.toolbox.decorate("mutate", gp.staticLimit(key=attrgetter("height"), max_value=17))
+        self.toolbox.decorate("mate", gp.staticLimit(key=attrgetter("height"), max_value=self.args["absolute_max_depth"]))
+        self.toolbox.decorate("mutate", gp.staticLimit(key=attrgetter("height"), max_value=self.args["absolute_max_depth"]))
 
     def fitness_function(self, individual):
         routine = gp.compile(individual, self.pset)
