@@ -1,4 +1,5 @@
 from functools import partial
+from copy import deepcopy
 
 from direction import Direction
 import random
@@ -17,13 +18,13 @@ class GameOver(Exception):
     pass
 
 class Game:
-    def __init__(self, map_size):
-        self.random_prey_gen = random.Random(0)
-        self.random_prey_move = random.Random(0)
-        self.random_prey_direction = random.Random(0)
+    def __init__(self, args):
+        self.random_prey_gen = random.Random(args["random_prey_gen"])
+        self.random_prey_move = random.Random(args["random_prey_move"])
+        self.random_prey_direction = random.Random(args["random_prey_direction"])
         self.map_size = {
-            "x": map_size[0],
-            "y": map_size[1],
+            "x": args["map_width"],
+            "y": args["map_height"],
         }
         self.predator = {
             "x": 0,
@@ -66,6 +67,20 @@ class Game:
                 self.random_prey_gen.choice([Direction.up, Direction.right, Direction.down, Direction.left]),
             )
     
+    def log_history(self):
+        self.predator["history"].append({
+            "x": deepcopy(self.predator["x"]),
+            "y": deepcopy(self.predator["y"]),
+            "direction": deepcopy(self.predator["direction"]),
+        })
+
+        for prey in self.preys:
+            prey["history"].append({
+                "x": deepcopy(prey["x"]),
+                "y": deepcopy(prey["y"]),
+                "direction": deepcopy(prey["direction"]),
+            })
+
     def get_number_of_prey_eaten(self):
         return self.predator["prey eaten"]
     
@@ -130,19 +145,22 @@ class Game:
                     creature["x"] -= 1
         # This check is a huge bottleneck in speed.
         self.check_if_prey_eaten()
+        self.log_history()
 
     def turn_left(self):
         self.move_prey()
         self.predator["direction"] = (Direction)((self.predator["direction"].value-1) % 4)
+        self.log_history()
 
     def turn_right(self):
         self.move_prey()
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
+        self.log_history()
 
     # This is for methods like if_in_front or if_nearby
     def if_then_else(self, condition, func1, func2):
         func1() if condition() else func2()
-    
+
     def run(self, routine):
         self._reset()
         try:
@@ -150,9 +168,3 @@ class Game:
         except GameOver:
             return
         # print("%s %s" % (self.predator["x"], self.predator["y"]))
-
-if __name__ == "__main__":
-    game = Game([1, 1])
-    creature = {"direction": Direction.right}
-    game.turn_left(creature)
-    print(creature["direction"])

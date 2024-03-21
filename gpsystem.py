@@ -5,17 +5,18 @@ from operator import attrgetter
 import random
 
 from readers.argreader import ArgReader
+from filewriter import FileWriter
 from game import Game, prog2, prog3
 
 class GPSystem:
     def __init__(self, arg_file):
         self.argreader = ArgReader(arg_file)
         self.args = self.argreader.get_all()
-        self.ephemeral_random = random.Random(0)
         self.pset = gp.PrimitiveSet("MAIN", 0)
         self.toolbox = base.Toolbox()
-        self.game = Game([self.args["map_width"], self.args["map_height"]])
-        
+        self.game = Game(self.args)
+        self.file_writer = FileWriter(self.game, self.args)
+
         # Number represents arity of operator.
         self.pset.addPrimitive(prog2, 2)
         # self.pset.addPrimitive(self.game.if_then_else, 2)
@@ -49,6 +50,7 @@ class GPSystem:
     def fitness_function(self, individual):
         routine = gp.compile(individual, self.pset)
         self.game.run(routine)
+        self.file_writer.write_individual()
         return self.game.get_number_of_prey_eaten(),
 
     def run(self):
