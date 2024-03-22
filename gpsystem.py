@@ -19,7 +19,7 @@ class GPSystem:
 
         # Number represents arity of operator.
         self.pset.addPrimitive(prog2, 2)
-        # self.pset.addPrimitive(self.game.if_then_else, 2)
+        self.pset.addPrimitive(self.game.if_prey_in_front, 2)
         self.pset.addPrimitive(prog3, 3)
         self.pset.addTerminal(self.game.move)
         self.pset.addTerminal(self.game.turn_left)
@@ -78,5 +78,13 @@ class GPSystem:
             halloffame=hof,
             verbose=True,
         )
-        bestVals, avgVals = log.chapters["fitness"].select("min", "avg")            
+        best_values, average_values = log.chapters["fitness"].select("max", "avg")
+
+        self.file_writer.write_averages_and_bests(best_values, average_values)
+        self.file_writer.write_hall_of_famers(hof)
+
+        # with open("HOF", "w") as file:
+        #     for h in hof:
+        #         file.write(f"{str(h)}\n")
+
         return pop, log, hof

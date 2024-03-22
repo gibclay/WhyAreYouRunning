@@ -14,6 +14,10 @@ def prog2(func1, func2):
 def prog3(func1, func2, func3):
     return partial(progn, func1, func2, func3)
 
+# This is for methods like if_prey_in_front or if_prey_nearby
+def if_then_else(condition, func1, func2):
+    func1() if condition() else func2()
+
 class GameOver(Exception):
     pass
 
@@ -35,7 +39,7 @@ class Game:
         }
         
         self.preys = []
-        for _ in range(8):
+        for _ in range(args["number_of_prey"]):
             self.add_prey(
                 self.random_prey_gen.randint(0, self.map_size["x"]-1), 
                 self.random_prey_gen.randint(0, self.map_size["y"]-1),
@@ -48,6 +52,7 @@ class Game:
             "y": y,
             "direction": direction,
             "history": [],
+            "is alive": True,
         })
     
     def _reset(self):
@@ -79,6 +84,7 @@ class Game:
                 "x": deepcopy(prey["x"]),
                 "y": deepcopy(prey["y"]),
                 "direction": deepcopy(prey["direction"]),
+                "is alive": deepcopy(prey["is alive"])
             })
 
     def get_number_of_prey_eaten(self):
@@ -90,37 +96,46 @@ class Game:
         return False
 
     def check_if_prey_eaten(self):
-        if len(self.preys) < 1:
-            raise GameOver
+        all_prey_are_dead = True
+
         for prey in self.preys:
-            if self.if_same_spot(self.predator, prey):
-                self.predator["prey eaten"] += 1
-                self.preys.remove(prey)
+            if prey["is alive"]:
+                all_prey_are_dead = False
+
+        if all_prey_are_dead:
+            raise GameOver
+        
+        for prey in self.preys:
+            if prey["is alive"]:
+                if self.if_same_spot(self.predator, prey):
+                    prey["is alive"] = False
+                    self.predator["prey eaten"] += 1
 
     def move_prey(self):
         for prey in self.preys:
-            match self.random_prey_move.randint(1, 2):
-                case 1:
-                    match prey["direction"]:
-                        case Direction.up:
-                            if prey["y"] > 0:
-                                prey["y"] -= 1
-                            return
-                        case Direction.right:
-                            if prey["x"] < self.map_size["x"]-1:
-                                prey["x"] += 1
-                            return
-                        case Direction.down:
-                            if prey["y"] < self.map_size["y"]-1:
-                                prey["y"] += 1
-                            return
-                        case Direction.left:
-                            if prey["x"] > 0:
-                                prey["x"] -= 1
-                            return
-                case 2:
-                    prey["direction"] = (Direction)(self.random_prey_direction.randint(0, 3))
-                    return
+            if prey["is alive"]:
+                match self.random_prey_move.choice([1, 1, 1, 2]):
+                    case 1:
+                        match prey["direction"]:
+                            case Direction.up:
+                                if prey["y"] > 0:
+                                    prey["y"] -= 1
+                                continue
+                            case Direction.right:
+                                if prey["x"] < self.map_size["x"]-1:
+                                    prey["x"] += 1
+                                continue
+                            case Direction.down:
+                                if prey["y"] < self.map_size["y"]-1:
+                                    prey["y"] += 1
+                                continue
+                            case Direction.left:
+                                if prey["x"] > 0:
+                                    prey["x"] -= 1
+                                continue
+                    case 2:
+                        prey["direction"] = (Direction)((self.random_prey_direction.choice([1, -1]) + prey["direction"].value) % 4)
+                        continue
 
     def move(self):
         self.move_prey()
@@ -143,7 +158,6 @@ class Game:
             case Direction.left:
                 if creature["x"] > 0:
                     creature["x"] -= 1
-        # This check is a huge bottleneck in speed.
         self.check_if_prey_eaten()
         self.log_history()
 
@@ -157,9 +171,31 @@ class Game:
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()
 
-    # This is for methods like if_in_front or if_nearby
-    def if_then_else(self, condition, func1, func2):
-        func1() if condition() else func2()
+    def is_there_something_in_front(self):
+        match self.predator["direction"]:
+            case Direction.up:
+                for prey in self.preys:
+                    if prey["y"] < self.predator["y"]:
+                        return True
+                return False
+            case Direction.right:
+                for prey in self.preys:
+                    if prey["x"] > self.predator["x"]:
+                        return True
+                return False
+            case Direction.down:
+                for prey in self.preys:
+                    if prey["y"] > self.predator["y"]:
+                        return True
+                return False
+            case Direction.left:
+                for prey in self.preys:
+                    if prey["x"] < self.predator["x"]:
+                        return True
+                return False
+
+    def if_prey_in_front(self, func1, func2):
+        return partial(if_then_else, self.is_there_something_in_front, func1, func2)
 
     def run(self, routine):
         self._reset()
@@ -167,4 +203,3 @@ class Game:
             routine()
         except GameOver:
             return
-        # print("%s %s" % (self.predator["x"], self.predator["y"]))
