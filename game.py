@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from direction import Direction
 import random
+import math
 
 def progn(*args):
         for arg in args:
@@ -139,6 +140,7 @@ class Game:
 
     def move(self):
         self.move_prey()
+        
         # Move forwards.
         creature = self.predator
 
@@ -170,6 +172,12 @@ class Game:
         self.move_prey()
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()
+
+    def check_if_prey_near(self):
+        for prey in self.preys:
+            if abs(self.predator["x"] - prey["x"]) <= 5 and abs(self.predator["y"] - prey["y"]) <= 5:
+                return True
+        return False
 
     def check_for_prey_in_a_direction(self, checking_direction_relative_to_predator):
         absolute_direction_of_the_prey = (self.predator["direction"].value + checking_direction_relative_to_predator.value) % 4
@@ -204,6 +212,9 @@ class Game:
     
     def is_there_something_to_the_right(self):
         return self.check_for_prey_in_a_direction(Direction.right)
+    
+    def is_there_something_to_the_bottom(self):
+        return self.check_for_prey_in_a_direction(Direction.down)
 
     def if_prey_in_front(self, func1, func2):
         return partial(if_then_else, self.is_there_something_in_front, func1, func2)
@@ -213,6 +224,12 @@ class Game:
     
     def if_prey_to_right(self, func1, func2):
         return partial(if_then_else, self.is_there_something_to_the_right, func1, func2)
+    
+    def if_prey_down(self, func1, func2):
+        return partial(if_then_else, self.is_there_something_to_the_bottom, func1, func2)
+
+    def if_prey_near(self, func1, func2):
+        return partial(if_then_else, self.check_if_prey_near, func1, func2)
 
     def run(self, routine):
         self._reset()

@@ -1,20 +1,20 @@
 # List of arguments.
-number_of_prey          = 8
+number_of_prey          = 10
 map_height              = 50
 map_width               = 50
 pop_size                = 500
 prob_crossover          = 0.95
 prob_mutation           = 0.05
-generations             = 50
+generations             = 5
 hof_size                = 5
-tournament_size         = 3
+tournament_size         = 4
 init_min_depth          = 5
 init_max_depth          = 9
 absolute_max_depth      = 14
 mutation_min_depth      = 7
 mutation_max_depth      = 14
 # Random seeds.
-random_gp               = 1001
-random_prey_gen         = 2
-random_prey_move        = 3
-random_prey_direction   = 4
+random_gp               = 10
+random_prey_gen         = 3
+random_prey_move        = 4
+random_prey_direction   = 5

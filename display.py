@@ -90,5 +90,5 @@ class Display:
                 return
 
 if __name__ == "__main__":
-    display = Display("args.txt", 1, 48, 1)
+    display = Display("args.txt", 7, 5, 3)
     display.run()
