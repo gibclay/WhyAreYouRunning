@@ -171,31 +171,45 @@ class Game:
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()
 
+    def check_for_prey_in_a_direction(self, direction):
+        if self.predator["direction"] == (Direction)((Direction.up.value-direction.value)%4):
+            for prey in self.preys:
+                if prey["y"] < self.predator["y"]:
+                    return True
+            return False
+        elif self.predator["direction"] == (Direction)((Direction.right.value-direction.value)%4):
+            for prey in self.preys:
+                if prey["x"] > self.predator["x"]:
+                    return True
+            return False
+        elif self.predator["direction"] == (Direction)((Direction.down.value-direction.value)%4):
+            for prey in self.preys:
+                if prey["y"] > self.predator["y"]:
+                    return True
+            return False
+        elif self.predator["direction"] == (Direction)((Direction.left.value-direction.value)%4):
+            for prey in self.preys:
+                if prey["x"] < self.predator["x"]:
+                    return True
+            return False
+
     def is_there_something_in_front(self):
-        match self.predator["direction"]:
-            case Direction.up:
-                for prey in self.preys:
-                    if prey["y"] < self.predator["y"]:
-                        return True
-                return False
-            case Direction.right:
-                for prey in self.preys:
-                    if prey["x"] > self.predator["x"]:
-                        return True
-                return False
-            case Direction.down:
-                for prey in self.preys:
-                    if prey["y"] > self.predator["y"]:
-                        return True
-                return False
-            case Direction.left:
-                for prey in self.preys:
-                    if prey["x"] < self.predator["x"]:
-                        return True
-                return False
+        return self.check_for_prey_in_a_direction(Direction.up)
+
+    def is_there_something_to_the_left(self):
+        return self.check_for_prey_in_a_direction(Direction.left)
+    
+    def is_there_something_to_the_right(self):
+        return self.check_for_prey_in_a_direction(Direction.right)
 
     def if_prey_in_front(self, func1, func2):
         return partial(if_then_else, self.is_there_something_in_front, func1, func2)
+    
+    def if_prey_to_left(self, func1, func2):
+        return partial(if_then_else, self.is_there_something_to_the_left, func1, func2)
+    
+    def if_prey_to_right(self, func1, func2):
+        return partial(if_then_else, self.is_there_something_to_the_right, func1, func2)
 
     def run(self, routine):
         self._reset()
