@@ -5,6 +5,10 @@ from readers.argreader import ArgReader
 
 class Display:
     def __init__(self, arg_file, run, gen, ind):
+        self.run_var = run
+        self.gen = gen
+        self.ind = ind
+
         self.index = 0
 
         self.argreader = ArgReader(arg_file)
@@ -48,6 +52,7 @@ class Display:
     
     def draw_frame(self, index):
         os.system("clear")
+        print("Run %s Gen %s Ind %s" % (self.run_var, self.gen, self.ind))
         for h in range(self.height):
             for w in range(self.width):
                 nobody_is_here = True
@@ -72,7 +77,7 @@ class Display:
                             nobody_is_here = False
 
                 if nobody_is_here:
-                    print("`", end="")
+                    print("_", end="")
             print()
         time.sleep(1/12)
 
@@ -85,5 +90,5 @@ class Display:
                 return
 
 if __name__ == "__main__":
-    display = Display("args.txt", 9, 8, 17)
+    display = Display("args.txt", 1, 48, 1)
     display.run()
