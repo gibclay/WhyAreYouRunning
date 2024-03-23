@@ -171,8 +171,8 @@ class Game:
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()
 
-    def check_for_prey_in_a_direction(self, direction_prey_is_in_relative_to_predator):
-        absolute_direction_of_the_prey = (self.predator["direction"].value + direction_prey_is_in_relative_to_predator.value) % 4
+    def check_for_prey_in_a_direction(self, checking_direction_relative_to_predator):
+        absolute_direction_of_the_prey = (self.predator["direction"].value + checking_direction_relative_to_predator.value) % 4
         absolute_direction_of_the_prey = (Direction)(absolute_direction_of_the_prey)
 
         if absolute_direction_of_the_prey == Direction.up:
