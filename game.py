@@ -171,23 +171,23 @@ class Game:
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()
 
-    def check_for_prey_in_a_direction(self, direction):
-        if self.predator["direction"] == (Direction)((Direction.up.value-direction.value)%4):
+    def check_for_prey_in_a_direction(self, direction_prey_is_in):
+        if self.predator["direction"] == (Direction)((Direction.up.value-direction_prey_is_in.value)%4):
             for prey in self.preys:
                 if prey["y"] < self.predator["y"]:
                     return True
             return False
-        elif self.predator["direction"] == (Direction)((Direction.right.value-direction.value)%4):
+        elif self.predator["direction"] == (Direction)((Direction.right.value-direction_prey_is_in.value)%4):
             for prey in self.preys:
                 if prey["x"] > self.predator["x"]:
                     return True
             return False
-        elif self.predator["direction"] == (Direction)((Direction.down.value-direction.value)%4):
+        elif self.predator["direction"] == (Direction)((Direction.down.value-direction_prey_is_in.value)%4):
             for prey in self.preys:
                 if prey["y"] > self.predator["y"]:
                     return True
             return False
-        elif self.predator["direction"] == (Direction)((Direction.left.value-direction.value)%4):
+        elif self.predator["direction"] == (Direction)((Direction.left.value-direction_prey_is_in.value)%4):
             for prey in self.preys:
                 if prey["x"] < self.predator["x"]:
                     return True
