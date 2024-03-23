@@ -3,7 +3,6 @@ from copy import deepcopy
 
 from direction import Direction
 import random
-import math
 
 def progn(*args):
         for arg in args:
@@ -23,7 +22,9 @@ class GameOver(Exception):
     pass
 
 class Game:
-    def __init__(self, args):
+    def __init__(self, args, wrap_enabled):
+        self.wrap_enabled = wrap_enabled
+
         self.random_prey_gen = random.Random(args["random_prey_gen"])
         self.random_prey_move = random.Random(args["random_prey_move"])
         self.random_prey_direction = random.Random(args["random_prey_direction"])
@@ -112,7 +113,7 @@ class Game:
                     prey["is alive"] = False
                     self.predator["prey eaten"] += 1
 
-    def move_prey(self):
+    def move_prey_no_wrap(self):
         for prey in self.preys:
             if prey["is alive"]:
                 match self.random_prey_move.choice([1, 1, 1, 2]):
@@ -138,8 +139,39 @@ class Game:
                         prey["direction"] = (Direction)((self.random_prey_direction.choice([1, -1]) + prey["direction"].value) % 4)
                         continue
 
+    def move_prey_wrap(self):
+        for prey in self.preys:
+            if prey["is alive"]:
+                match self.random_prey_move.choice([1, 1, 1, 2]):
+                    case 1:
+                        match prey["direction"]:
+                            case Direction.up:
+                                prey["y"] = (prey["y"] - 1) % self.map_size["y"]
+                                continue
+                            case Direction.right:
+                                prey["x"] = (prey["x"] + 1) % self.map_size["x"]
+                                continue
+                            case Direction.down:
+                                prey["y"] = (prey["y"] + 1) % self.map_size["y"]
+                                continue
+                            case Direction.left:
+                                prey["x"] = (prey["x"] - 1) % self.map_size["x"]
+                                continue
+                    case 2:
+                        prey["direction"] = (Direction)((self.random_prey_direction.choice([1, -1]) + prey["direction"].value) % 4)
+                        continue
+
     def move(self):
-        self.move_prey()
+        if not self.wrap_enabled:
+            self.move_no_wrap()
+        else:
+            self.move_wrap()
+
+    def move_no_wrap(self):
+        self.check_if_prey_eaten()
+        self.log_history()
+
+        self.move_prey_no_wrap()
         
         # Move forwards.
         creature = self.predator
@@ -160,16 +192,46 @@ class Game:
             case Direction.left:
                 if creature["x"] > 0:
                     creature["x"] -= 1
+                return
+        
+    def move_wrap(self):
         self.check_if_prey_eaten()
         self.log_history()
 
+        self.move_prey_wrap()
+        
+        # Move forwards.
+        creature = self.predator
+
+        match creature["direction"]:
+            case Direction.up:
+                creature["y"] = (creature["y"] - 1) % self.map_size["y"]
+                return
+            case Direction.right:
+                creature["x"] = (creature["x"] + 1) % self.map_size["x"]
+                return
+            case Direction.down:
+                creature["y"] = (creature["y"] + 1) % self.map_size["y"]
+                return
+            case Direction.left:
+                creature["x"] = (creature["x"] + 1) % self.map_size["x"]
+                return
+        
     def turn_left(self):
-        self.move_prey()
+        if not self.wrap_enabled:
+            self.move_prey_no_wrap()
+        else:
+            self.move_prey_wrap()
+
         self.predator["direction"] = (Direction)((self.predator["direction"].value-1) % 4)
         self.log_history()
 
     def turn_right(self):
-        self.move_prey()
+        if not self.wrap_enabled:
+            self.move_prey_no_wrap()
+        else:
+            self.move_prey_wrap()
+
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()
 
