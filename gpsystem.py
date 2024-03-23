@@ -20,6 +20,8 @@ class GPSystem:
         # Number represents arity of operator.
         self.pset.addPrimitive(prog2, 2)
         self.pset.addPrimitive(self.game.if_prey_in_front, 2)
+        self.pset.addPrimitive(self.game.if_prey_to_left, 2)
+        self.pset.addPrimitive(self.game.if_prey_to_right, 2)
         self.pset.addPrimitive(prog3, 3)
         self.pset.addTerminal(self.game.move)
         self.pset.addTerminal(self.game.turn_left)
@@ -54,7 +56,7 @@ class GPSystem:
         return self.game.get_number_of_prey_eaten(),
 
     def run(self):
-        random.seed(1)
+        random.seed(self.args["random_gp"])
         pop = self.toolbox.population(n=self.args["pop_size"])
         hof = tools.HallOfFame(self.args["hof_size"])
 
