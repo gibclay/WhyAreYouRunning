@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from readers.argreader import ArgReader
 
-runs_to_plot = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+runs_to_plot = [19]
 
 class GetPlot:
     def __init__(self, arg_file, run_list):

@@ -166,6 +166,7 @@ class Game:
             self.move_no_wrap()
         else:
             self.move_wrap()
+        # self.check_turns()
 
     def move_no_wrap(self):
         self.check_if_prey_eaten()
@@ -222,6 +223,7 @@ class Game:
             self.move_prey_no_wrap()
         else:
             self.move_prey_wrap()
+        # self.check_turns()
 
         self.predator["direction"] = (Direction)((self.predator["direction"].value-1) % 4)
         self.log_history()
@@ -231,6 +233,7 @@ class Game:
             self.move_prey_no_wrap()
         else:
             self.move_prey_wrap()
+        # self.check_turns()
 
         self.predator["direction"] = (Direction)((self.predator["direction"].value+1) % 4)
         self.log_history()

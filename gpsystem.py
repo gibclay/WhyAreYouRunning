@@ -9,13 +9,15 @@ from filewriter import FileWriter
 from game import Game, prog2, prog3
 
 class GPSystem:
-    def __init__(self, arg_file):
+    def __init__(self, arg_file, seed):
+        random.seed(seed)
         self.argreader = ArgReader(arg_file)
         self.args = self.argreader.get_all()
         self.pset = gp.PrimitiveSet("MAIN", 0)
         self.toolbox = base.Toolbox()
-        self.game = Game(self.args, False)
+        self.game = Game(self.args, True)
         self.file_writer = FileWriter(self.game, self.args)
+        self.new_seed = seed
 
         # Number represents arity of operator.
         self.pset.addPrimitive(prog2, 2)
@@ -57,7 +59,6 @@ class GPSystem:
         return self.game.get_number_of_prey_eaten(),
 
     def run(self):
-        random.seed(self.args["random_gp"])
         pop = self.toolbox.population(n=self.args["pop_size"])
         hof = tools.HallOfFame(self.args["hof_size"])
 
