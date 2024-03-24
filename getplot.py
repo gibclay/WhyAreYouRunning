@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 
 from readers.argreader import ArgReader
 
+runs_to_plot = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 class GetPlot:
     def __init__(self, arg_file, run_list):
         self.argreader = ArgReader(arg_file)
@@ -30,17 +32,17 @@ class GetPlot:
             self.average_of_bests[i] /= len(run_list)
     
     def generate_plot(self):
-        plt.plot(self.average_of_bests, color="red", label="bests")
-        plt.plot(self.average_of_averages, color="green", label="averages")
+        plt.plot(self.average_of_bests, color="red", label="Best (Mean)")
+        plt.plot(self.average_of_averages, color="green", label="Average (Mean)")
         plt.legend(loc="upper left")
-        plt.xlabel("Generations")
-        plt.ylabel("Fitness")
-        plt.title("Bests and Averages on a Generations vs Fitness Plot")
+        plt.xlabel("Generation")
+        plt.ylabel(f'Fitness (Average of {len(runs_to_plot)} Runs)')
+        plt.title(f'Average & Mean Best Fitness for Individuals (Over {len(runs_to_plot)} Runs)')
         plt.savefig(f"plot.png")
 
 
 if __name__ == "__main__":
     # This is the list of runs you want for the plot. ex. [0, 4, 23, 1, 9]
     # All the values from these runs will be averaged and plotted.
-    getplot = GetPlot("args.txt", [0])
+    getplot = GetPlot("args.txt", runs_to_plot)
     getplot.generate_plot()

@@ -14,7 +14,7 @@ absolute_max_depth      = 13
 mutation_min_depth      = 7
 mutation_max_depth      = 13
 # Random seeds.
-random_gp               = 5
+random_gp               = 9
 random_prey_gen         = 2
 random_prey_move        = 3
 random_prey_direction   = 4
