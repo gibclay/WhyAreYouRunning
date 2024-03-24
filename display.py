@@ -21,6 +21,8 @@ class Display:
         self.predator_history = []
         self.prey_histories = []
 
+        self.path_matrix = [["" for _ in range(self.args["map_width"])] for _ in range(self.args["map_height"])]
+
         # Add predator history.
         with open(f"{self.individual_path}/predator.txt") as file:
             for line in file.read().split("\n"):
@@ -51,22 +53,31 @@ class Display:
             self.prey_histories.append(prey_history)
     
     def draw_frame(self, index):
+        self.predator_history[index]
         os.system("cls")
         print("Run %s Gen %s Ind %s" % (self.run_var, self.gen, self.ind))
         for h in range(self.height):
             for w in range(self.width):
                 nobody_is_here = True
 
-                if self.predator_history[index]["x"] == w and self.predator_history[index]["y"] == h:
+                if self.path_matrix[h][w] != "":
+                    print(self.path_matrix[h][w], end="")
+                    nobody_is_here = False
+
+                if self.predator_history[index]["x"] == w and self.predator_history[index]["y"] == h:                    
                     match self.predator_history[index]["direction"]:
                         case "up":
                             print("^", end="")
+                            self.path_matrix[h][w] = "^"
                         case "right":
                             print(">", end="")
+                            self.path_matrix[h][w] = ">"
                         case "down":
                             print("v", end="")
+                            self.path_matrix[h][w] = "v"
                         case "left":
                             print("<", end="")
+                            self.path_matrix[h][w] = "<"
                     # print("P", end="")
                     nobody_is_here = False
 
@@ -79,7 +90,7 @@ class Display:
                 if nobody_is_here:
                     print("_", end="")
             print()
-        time.sleep(1/30)
+        #time.sleep(1/12)
 
     def run(self):
         while True:
