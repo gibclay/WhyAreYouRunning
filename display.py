@@ -54,7 +54,7 @@ class Display:
     
     def draw_frame(self, index):
         self.predator_history[index]
-        os.system("cls")
+        os.system('cls' if os.name == 'nt' else 'clear')
         print("Run %s Gen %s Ind %s" % (self.run_var, self.gen, self.ind))
         for h in range(self.height):
             for w in range(self.width):
