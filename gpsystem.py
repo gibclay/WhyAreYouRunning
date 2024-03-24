@@ -14,7 +14,7 @@ class GPSystem:
         self.args = self.argreader.get_all()
         self.pset = gp.PrimitiveSet("MAIN", 0)
         self.toolbox = base.Toolbox()
-        self.game = Game(self.args, wrap_enabled=False)
+        self.game = Game(self.args, False)
         self.file_writer = FileWriter(self.game, self.args)
 
         # Number represents arity of operator.
@@ -23,7 +23,7 @@ class GPSystem:
         # self.pset.addPrimitive(self.game.if_prey_to_left, 2)
         # self.pset.addPrimitive(self.game.if_prey_to_right, 2)
         # self.pset.addPrimitive(self.game.if_prey_down, 2)
-        # self.pset.addPrimitive(self.game.if_prey_near, 2)
+        self.pset.addPrimitive(self.game.if_prey_near, 2)
         self.pset.addPrimitive(prog3, 3)
         self.pset.addTerminal(self.game.move)
         self.pset.addTerminal(self.game.turn_left)

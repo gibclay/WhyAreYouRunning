@@ -51,7 +51,7 @@ class Display:
             self.prey_histories.append(prey_history)
     
     def draw_frame(self, index):
-        os.system("clear")
+        os.system("cls")
         print("Run %s Gen %s Ind %s" % (self.run_var, self.gen, self.ind))
         for h in range(self.height):
             for w in range(self.width):
@@ -79,7 +79,7 @@ class Display:
                 if nobody_is_here:
                     print("_", end="")
             print()
-        time.sleep(1/12)
+        time.sleep(1/30)
 
     def run(self):
         while True:
@@ -90,5 +90,5 @@ class Display:
                 return
 
 if __name__ == "__main__":
-    display = Display("args.txt", 7, 5, 3)
+    display = Display("args.txt", 5, 0, 0)
     display.run()
